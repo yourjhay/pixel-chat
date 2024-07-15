@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Models;
+
+use App\Helpers\EncryptDecrypt;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
+class Conversation extends Model
+{
+    use HasFactory;
+
+    public function members()
+    {
+        return $this->hasMany(ConversationMember::class);
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+}

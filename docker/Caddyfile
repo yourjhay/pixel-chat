@@ -1,0 +1,11 @@
+# CHANGE THIS TO YOUR PREFERED DOMAIN NAME
+# OR CHECK DOCUMENTATION https://caddyserver.com/docs/
+ :80 {
+  root * /app/public
+  encode gzip
+  # Serve Laravel application through PHP-FPM
+  php_fastcgi application:9000
+ 
+  # Serve static files directly
+  file_server
+}
