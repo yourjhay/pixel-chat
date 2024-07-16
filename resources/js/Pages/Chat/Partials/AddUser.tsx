@@ -70,7 +70,7 @@ const NewUser: React.FC<Props> = (props) => {
                         >
                             {processing
                                 ? "Adding member..."
-                                : `Add${data.nickname} `}
+                                : `Add ${data.nickname} `}
                         </PrimaryButton>
                         <SecondaryButton onClick={() => setShow(false)}>
                             Cancel
