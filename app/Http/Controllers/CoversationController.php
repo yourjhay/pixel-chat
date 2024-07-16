@@ -39,7 +39,7 @@ class CoversationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|min:3|max:40',
+            'name' => 'required|string|min:3|max:30',
         ]);
 
         $conversations = Conversation::where('user_id', auth()->id())->count();

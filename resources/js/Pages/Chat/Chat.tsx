@@ -134,13 +134,15 @@ export default function Chat({
                         </div>
                     </Link>
 
-                    <h2 className="text-xl font-bold text-gray-500 my-3">
-                        {conversation.name}
-                    </h2>
-                    <span className="text-gray-500 text-sm mt-1 ">
-                        {onlines.length}{" "}
-                        {onlines.length === 1 ? "user" : "users"} online
-                    </span>
+                    <div className="flex flex-col ">
+                        <h2 className="text-xl font-bold text-gray-500 ">
+                            {conversation.name}
+                        </h2>
+                        <span className="text-gray-500 text-sm ">
+                            {onlines.length}{" "}
+                            {onlines.length === 1 ? "user" : "users"} online
+                        </span>
+                    </div>
                 </div>
                 {conversation.type === "private" ? (
                     <NewUser conversationId={conversation.id} />
