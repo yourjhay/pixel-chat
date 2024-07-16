@@ -2,11 +2,7 @@ import MessageCreator from "@/Components/MessageCreator";
 import Modal from "@/Components/Modal";
 import OnlineStatus from "@/Components/OnlineStatus";
 import { Conversation, Message, PageProps, User } from "@/types";
-import {
-    GlobeAltIcon,
-    PaperAirplaneIcon,
-    XCircleIcon,
-} from "@heroicons/react/24/outline";
+import { GlobeAltIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { Head, Link, useForm } from "@inertiajs/react";
 import moment from "moment";
@@ -31,15 +27,16 @@ export default function Chat({
     const listRef = React.createRef<HTMLDivElement>();
     const nickname = auth.user?.nickname;
     const [imageFull, setImageFull] = useState("");
-    const { data, setData, post, processing, errors, reset } = useForm<{
-        message: string;
-        type: "text" | "image";
-        image: File | null;
-    }>({
-        message: "",
-        type: "text",
-        image: null,
-    });
+    const { data, setData, post, processing, errors, reset, progress } =
+        useForm<{
+            message: string;
+            type: "text" | "image";
+            image: File | null;
+        }>({
+            message: "",
+            type: "text",
+            image: null,
+        });
 
     const [chats, setMessages] = useState<Message[]>(conversation.messages);
     const [onlines, setOnlines] = useState<Array<number>>([]);
@@ -141,11 +138,15 @@ export default function Chat({
             className="md:max-w-xl md:mt-10 mx-auto"
             style={{ height: "70lvh" }}
         >
-            <Modal show={imageFull !== ""} onClose={() => setImageFull("")}>
-                <div className="flex justify-center p-6 relative">
+            <Modal
+                show={imageFull !== ""}
+                maxWidth="full"
+                onClose={() => setImageFull("")}
+            >
+                <div className="flex justify-center relative">
                     <XCircleIcon
                         onClick={() => setImageFull("")}
-                        className="absolute right-10 top-10 w-10 h-10 text-red-500"
+                        className="absolute right-3 top-3 w-10 h-10 text-gray-700 p-1 bg-gray-300 border border-pink-300 rounded-full cursor-pointer"
                     />
                     <img
                         src={imageFull}
@@ -227,7 +228,9 @@ export default function Chat({
                                 </div>
                             )}
                             <div className="w-full text-balance break-words">
-                                {msg.message && renderText(msg.message)}
+                                <p className="text-md">
+                                    {msg.message && renderText(msg.message)}
+                                </p>
                                 {msg.media?.length > 0 && (
                                     <img
                                         onClick={() =>
@@ -236,7 +239,7 @@ export default function Chat({
                                             )
                                         }
                                         src={msg.media[0].preview_url}
-                                        className="w-32 h-32 object-cover"
+                                        className="w-32 h-32 object-cover rounded-lg cursor-pointer"
                                     />
                                 )}
                             </div>
@@ -262,30 +265,23 @@ export default function Chat({
                 )}
             </div>
             <form onSubmit={handleSubmit} method="post">
-                <div className="flex flex-row gap-3 mt-3 px-2 items-start">
-                    <MessageCreator
-                        image={data.image}
-                        onFileChange={(e) => {
-                            if (!e.target.files) {
-                                return;
-                            } else {
-                                setData("image", e.target.files[0]);
-                            }
-                        }}
-                        isTyping={isTyping}
-                        message={data.message}
-                        errors={errors}
-                        processing={processing}
-                        setMessage={setData}
-                    />
-
-                    <button
-                        type="submit"
-                        disabled={processing || (!data.message && !data.image)}
-                    >
-                        <PaperAirplaneIcon className="w-8 h-8 mt-2 text-blue-700" />
-                    </button>
-                </div>
+                <MessageCreator
+                    progress={progress}
+                    clearFile={() => setData("image", null)}
+                    image={data.image}
+                    onFileChange={(e) => {
+                        if (!e.target.files) {
+                            return;
+                        } else {
+                            setData("image", e.target.files[0]);
+                        }
+                    }}
+                    isTyping={isTyping}
+                    message={data.message}
+                    errors={errors}
+                    processing={processing}
+                    setMessage={setData}
+                />
             </form>
         </div>
     );

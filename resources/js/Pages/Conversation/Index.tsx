@@ -43,12 +43,14 @@ function Coversation({ conversations, nickname, auth }: Props & PageProps) {
             <div className="flex flex-row-reverse justify-between items-center">
                 {auth.user?.id && <NewRoom />}
                 {nickname && (
-                    <div className="flex flex-row gap-2 items-center text-indigo-500">
-                        <UserCircleIcon className="w-6 h-6" />
-                        <p className="text-lg  font-bold">
-                            {auth.user.nickname}
-                        </p>
-                    </div>
+                    <Link href={route("profile.edit")}>
+                        <div className="flex flex-row gap-2 items-center cursor-pointer text-indigo-500">
+                            <UserCircleIcon className="w-6 h-6" />
+                            <p className="text-lg  font-bold">
+                                {auth.user.nickname}
+                            </p>
+                        </div>
+                    </Link>
                 )}
             </div>
             <Head title="Coversations" />
