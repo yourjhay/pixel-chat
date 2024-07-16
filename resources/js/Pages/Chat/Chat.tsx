@@ -135,7 +135,7 @@ export default function Chat({
             )
         );
     };
-
+    console.log(conversation);
     return (
         <div
             className="md:max-w-xl md:mt-10 mx-auto"

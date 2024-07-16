@@ -6,6 +6,7 @@ use App\Events\MessageEvent;
 use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -32,20 +33,27 @@ class MessageController extends Controller
             'type' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:10000',
         ]);
-        $message = new Message;
-        $message->message = $request->message;
-        $message->conversation_id = $chatID;
-        $message->user_id = auth()->id();
-        $message->type = $request->image === null ? 'text' : 'file';
-        $message->save();
-        $image = $request->file('image');
-        if ($image) {
-            $newfilename = uniqid() . '_' . date('Ymdhms.') . $image->extension();
-            $message->addMediaFromRequest('image')
-                ->usingFileName($newfilename)
-                ->toMediaCollection('images');
-        }
+        try {
+            DB::beginTransaction();
+            $message = new Message;
+            $message->message = $request->message;
+            $message->conversation_id = $chatID;
+            $message->user_id = auth()->id();
+            $message->type = $request->image === null ? 'text' : 'file';
+            $message->save();
+            $image = $request->file('image');
+            if ($image) {
+                $newfilename = uniqid() . '_' . date('Ymdhms.') . $image->extension();
+                $message->addMediaFromRequest('image')
+                    ->usingFileName($newfilename)
+                    ->toMediaCollection('images');
+            }
 
-        MessageEvent::dispatch($chatID, $message->load('user')->load('media'));
+            MessageEvent::dispatch($chatID, $message->load('user')->load('media'));
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
     }
 }
