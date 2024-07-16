@@ -31,7 +31,7 @@ class MessageController extends Controller
         $request->validate([
             'message' => 'required_if:image,null|nullable|string',
             'type' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:10000',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10000',
         ]);
         try {
             DB::beginTransaction();
