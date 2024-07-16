@@ -105,6 +105,17 @@ export default function Login({
                         Log in
                     </PrimaryButton>
                 </div>
+                <div className="text-center mt-4">
+                    <p>
+                        Don't have an account?{" "}
+                        <a
+                            className="underline  text-gray-600 hover:text-gray-900"
+                            href={route("conversation")}
+                        >
+                            Sign up & Chat
+                        </a>
+                    </p>
+                </div>
             </form>
         </GuestLayout>
     );

@@ -54,7 +54,14 @@ function MessageCreator({ ...props }: Props) {
                 />
 
                 {props.errors.message && (
-                    <div className="text-red-500">{props.errors.message}</div>
+                    <div className="text-red-500 text-xs">
+                        {props.errors.message}
+                    </div>
+                )}
+                {props.errors.image && (
+                    <div className="text-red-500 text-xs">
+                        {props.errors.image}
+                    </div>
                 )}
                 {props.processing && (
                     <div className="text-gray-500 text-xs">Sending...</div>
