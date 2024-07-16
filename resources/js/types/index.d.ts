@@ -25,6 +25,14 @@ export interface Nickname {
     created_at: string;
 }
 
+export interface Media {
+    id: number;
+    collection_name: string;
+    size: number;
+    original_url: string;
+    preview_url: string;
+    name: string;
+}
 export interface Message {
     id?: number;
     conversation_id?: number;
@@ -33,4 +41,5 @@ export interface Message {
     file?: string;
     created_at: string;
     type: "text" | "file";
+    media: Media[];
 }

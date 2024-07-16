@@ -1,9 +1,14 @@
+import MessageCreator from "@/Components/MessageCreator";
+import Modal from "@/Components/Modal";
 import OnlineStatus from "@/Components/OnlineStatus";
 import { Conversation, Message, PageProps, User } from "@/types";
-import { GlobeAltIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import {
+    GlobeAltIcon,
+    PaperAirplaneIcon,
+    XCircleIcon,
+} from "@heroicons/react/24/outline";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { Head, Link, useForm } from "@inertiajs/react";
-
 import moment from "moment";
 import React, { FormEventHandler, useEffect, useState } from "react";
 import NewUser from "./Partials/AddUser";
@@ -25,9 +30,15 @@ export default function Chat({
 }: Props & PageProps) {
     const listRef = React.createRef<HTMLDivElement>();
     const nickname = auth.user?.nickname;
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const [imageFull, setImageFull] = useState("");
+    const { data, setData, post, processing, errors, reset } = useForm<{
+        message: string;
+        type: "text" | "image";
+        image: File | null;
+    }>({
         message: "",
         type: "text",
+        image: null,
     });
 
     const [chats, setMessages] = useState<Message[]>(conversation.messages);
@@ -70,6 +81,7 @@ export default function Chat({
                     user: "",
                     typing: false,
                 });
+                console.log(e.message);
                 setMessages((prev) => [e.message, ...prev]);
             });
 
@@ -107,8 +119,9 @@ export default function Chat({
     const URL_REGEX =
         /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 
-    const renderText = (txt: string) =>
-        txt.split(" ").map((part) =>
+    const renderText = (txt: string) => {
+        if (!txt) return;
+        return txt.split(" ").map((part) =>
             URL_REGEX.test(part) ? (
                 <a
                     target="_blank"
@@ -121,12 +134,26 @@ export default function Chat({
                 part + " "
             )
         );
+    };
 
     return (
         <div
             className="md:max-w-xl md:mt-10 mx-auto"
             style={{ height: "70lvh" }}
         >
+            <Modal show={imageFull !== ""} onClose={() => setImageFull("")}>
+                <div className="flex justify-center p-6 relative">
+                    <XCircleIcon
+                        onClick={() => setImageFull("")}
+                        className="absolute right-10 top-10 w-10 h-10 text-red-500"
+                    />
+                    <img
+                        src={imageFull}
+                        className="w-auto "
+                        style={{ maxHeight: "90lvh" }}
+                    />
+                </div>
+            </Modal>
             <Head title={`Chat ${chatID}`} />
             <div className="flex flex-row justify-between items-center bg-gray-200  px-2 py-3">
                 <div className="flex flex-row gap-2 items-center">
@@ -200,7 +227,18 @@ export default function Chat({
                                 </div>
                             )}
                             <div className="w-full text-balance break-words">
-                                <p>{renderText(msg.message)}</p>
+                                {msg.message && renderText(msg.message)}
+                                {msg.media?.length > 0 && (
+                                    <img
+                                        onClick={() =>
+                                            setImageFull(
+                                                msg.media[0].original_url
+                                            )
+                                        }
+                                        src={msg.media[0].preview_url}
+                                        className="w-32 h-32 object-cover"
+                                    />
+                                )}
                             </div>
                             <p
                                 className={`text-xs ${
@@ -225,30 +263,25 @@ export default function Chat({
             </div>
             <form onSubmit={handleSubmit} method="post">
                 <div className="flex flex-row gap-3 mt-3 px-2 items-start">
-                    <div className="grow">
-                        <input
-                            placeholder="Message"
-                            autoComplete="off"
-                            onKeyDown={isTyping}
-                            className="input w-full text-lg rounded-lg"
-                            type="text"
-                            name="message"
-                            value={data.message}
-                            onChange={(e) => setData("message", e.target.value)}
-                        />
-                        {errors.message && (
-                            <div className="text-red-500">{errors.message}</div>
-                        )}
-                        {processing && (
-                            <div className="text-gray-500 text-xs">
-                                Sending...
-                            </div>
-                        )}
-                    </div>
+                    <MessageCreator
+                        image={data.image}
+                        onFileChange={(e) => {
+                            if (!e.target.files) {
+                                return;
+                            } else {
+                                setData("image", e.target.files[0]);
+                            }
+                        }}
+                        isTyping={isTyping}
+                        message={data.message}
+                        errors={errors}
+                        processing={processing}
+                        setMessage={setData}
+                    />
 
                     <button
                         type="submit"
-                        disabled={processing || !data.message}
+                        disabled={processing || (!data.message && !data.image)}
                     >
                         <PaperAirplaneIcon className="w-8 h-8 mt-2 text-blue-700" />
                     </button>

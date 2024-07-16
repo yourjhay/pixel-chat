@@ -16,7 +16,7 @@ class MessageController extends Controller
     public function index(Request $request, $chatID)
     {
         $conversation = Conversation::where('id', $chatID)->with('messages', function ($query) {
-            $query->with('user')->orderBy('created_at', 'DESC')->limit(100);
+            $query->with('media')->with('user')->orderBy('created_at', 'DESC')->limit(100);
         })->first();
 
         return Inertia::render('Chat/Chat', [
@@ -28,15 +28,24 @@ class MessageController extends Controller
     public function store(Request $request, $chatID)
     {
         $request->validate([
-            'message' => 'required|string',
+            'message' => 'required_if:image,null|nullable|string',
             'type' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:10000',
         ]);
         $message = new Message;
         $message->message = $request->message;
         $message->conversation_id = $chatID;
         $message->user_id = auth()->id();
-        $message->type = $request->type;
+        $message->type = $request->image === null ? 'text' : 'file';
         $message->save();
-        MessageEvent::dispatch($chatID, $message->load('user'));
+        $image = $request->file('image');
+        if ($image) {
+            $newfilename = uniqid() . '_' . date('Ymdhms.') . $image->extension();
+            $message->addMediaFromRequest('image')
+                ->usingFileName($newfilename)
+                ->toMediaCollection('images');
+        }
+
+        MessageEvent::dispatch($chatID, $message->load('user')->load('media'));
     }
 }
