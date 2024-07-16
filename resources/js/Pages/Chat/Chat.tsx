@@ -123,7 +123,10 @@ export default function Chat({
         );
 
     return (
-        <div className="md:max-w-xl md:mt-10 mx-auto">
+        <div
+            className="md:max-w-xl md:mt-10 mx-auto"
+            style={{ height: "70lvh" }}
+        >
             <Head title={`Chat ${chatID}`} />
             <div className="flex flex-row justify-between items-center bg-gray-200  px-2 py-3">
                 <div className="flex flex-row gap-2 items-center">
@@ -151,79 +154,76 @@ export default function Chat({
                     </p>
                 )}
             </div>
-            <form onSubmit={handleSubmit} method="post">
-                <div
-                    ref={listRef}
-                    style={{ height: "70dvh" }}
-                    className="flex flex-col-reverse gap-2 px-2 overflow-auto no-scrollbar"
-                >
-                    <div className="my-2">
-                        <div className="text-gray-500 text-xs italic">
-                            {typing.user && `${typing.user} is typing...`}
-                        </div>
+            <div
+                ref={listRef}
+                style={{ height: "100%" }}
+                className="flex  flex-col-reverse gap-2 px-2 overflow-auto no-scrollbar"
+            >
+                <div className="my-2">
+                    <div className="text-gray-500 text-xs italic">
+                        {typing.user && `${typing.user} is typing...`}
                     </div>
-                    {chats.slice(0, 100).map((msg) => (
+                </div>
+                {chats.slice(0, 100).map((msg) => (
+                    <div
+                        key={msg.id}
+                        className="flex flex-row gap-2"
+                        style={{
+                            justifyContent:
+                                msg.user.nickname === nickname
+                                    ? "flex-end"
+                                    : "flex-start",
+                        }}
+                    >
                         <div
-                            key={msg.id}
-                            className="flex flex-row gap-2"
+                            className="rounded-lg p-2 "
                             style={{
-                                justifyContent:
+                                backgroundColor:
                                     msg.user.nickname === nickname
-                                        ? "flex-end"
-                                        : "flex-start",
+                                        ? "#2f82ed"
+                                        : "#e2e8f0",
+                                maxWidth: "60%",
+                                color:
+                                    msg.user.nickname === nickname
+                                        ? "white"
+                                        : "black",
                             }}
                         >
-                            <div
-                                className="rounded-lg p-2 "
-                                style={{
-                                    backgroundColor:
-                                        msg.user.nickname === nickname
-                                            ? "#2f82ed"
-                                            : "#e2e8f0",
-                                    maxWidth: "60%",
-                                    color:
-                                        msg.user.nickname === nickname
-                                            ? "white"
-                                            : "black",
-                                }}
-                            >
-                                {msg.user.nickname != nickname && (
-                                    <div className="flex flex-row gap-1 items-center">
-                                        <OnlineStatus
-                                            online={onlines.includes(
-                                                msg.user.id
-                                            )}
-                                        />
-                                        <p className="text-xs text-pink-500">
-                                            {msg.user.nickname}{" "}
-                                        </p>
-                                    </div>
-                                )}
-                                <div className="w-full text-balance break-words">
-                                    <p>{renderText(msg.message)}</p>
+                            {msg.user.nickname != nickname && (
+                                <div className="flex flex-row gap-1 items-center">
+                                    <OnlineStatus
+                                        online={onlines.includes(msg.user.id)}
+                                    />
+                                    <p className="text-xs text-pink-500">
+                                        {msg.user.nickname}{" "}
+                                    </p>
                                 </div>
-                                <p
-                                    className={`text-xs ${
-                                        msg.user.nickname === nickname
-                                            ? "text-gray-100"
-                                            : "text-gray-500"
-                                    } text-right`}
-                                >
-                                    {moment(msg.created_at).fromNow()}
-                                </p>
+                            )}
+                            <div className="w-full text-balance break-words">
+                                <p>{renderText(msg.message)}</p>
                             </div>
+                            <p
+                                className={`text-xs ${
+                                    msg.user.nickname === nickname
+                                        ? "text-gray-100"
+                                        : "text-gray-500"
+                                } text-right`}
+                            >
+                                {moment(msg.created_at).fromNow()}
+                            </p>
                         </div>
-                    ))}
-                    {chats.length === 0 && (
-                        <div className="text-center text-gray-500">
-                            <h3 className="text-xl font-bold">
-                                {conversation.name}
-                            </h3>
-                            No messages yet. Why don't you send one?
-                        </div>
-                    )}
-                </div>
-
+                    </div>
+                ))}
+                {chats.length === 0 && (
+                    <div className="text-center text-gray-500">
+                        <h3 className="text-xl font-bold">
+                            {conversation.name}
+                        </h3>
+                        No messages yet. Why don't you send one?
+                    </div>
+                )}
+            </div>
+            <form onSubmit={handleSubmit} method="post">
                 <div className="flex flex-row gap-2 mt-3 px-2">
                     <div className="grow">
                         <input
