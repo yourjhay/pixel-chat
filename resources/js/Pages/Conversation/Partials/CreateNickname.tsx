@@ -63,7 +63,7 @@ const CreateNickname: React.FC<Props> = (props) => {
                                 name="password"
                                 value={data.pin}
                                 onChange={(e) => setData("pin", e.target.value)}
-                                className="mt-1 block w-1/4"
+                                className="mt-1 block w-3/4 md:w-1/4"
                                 isFocused
                                 placeholder="Create 4 Digit PIN"
                                 autoComplete="off"
