@@ -154,7 +154,7 @@ export default function Chat({
             <form onSubmit={handleSubmit} method="post">
                 <div
                     ref={listRef}
-                    style={{ height: "70svh" }}
+                    style={{ height: "70dvh" }}
                     className="flex flex-col-reverse gap-2 px-2 overflow-auto no-scrollbar"
                 >
                     <div className="my-2">
