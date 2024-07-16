@@ -224,13 +224,13 @@ export default function Chat({
                 )}
             </div>
             <form onSubmit={handleSubmit} method="post">
-                <div className="flex flex-row gap-2 mt-3 px-2">
+                <div className="flex flex-row gap-3 mt-3 px-2 items-start">
                     <div className="grow">
                         <input
                             placeholder="Message"
                             autoComplete="off"
                             onKeyDown={isTyping}
-                            className="input w-full text-lg rounded-full"
+                            className="input w-full text-lg rounded-lg"
                             type="text"
                             name="message"
                             value={data.message}
@@ -239,13 +239,18 @@ export default function Chat({
                         {errors.message && (
                             <div className="text-red-500">{errors.message}</div>
                         )}
+                        {processing && (
+                            <div className="text-gray-500 text-xs">
+                                Sending...
+                            </div>
+                        )}
                     </div>
 
                     <button
                         type="submit"
                         disabled={processing || !data.message}
                     >
-                        <PaperAirplaneIcon className="w-7 h-7 text-blue-700" />
+                        <PaperAirplaneIcon className="w-8 h-8 mt-2 text-blue-700" />
                     </button>
                 </div>
             </form>
