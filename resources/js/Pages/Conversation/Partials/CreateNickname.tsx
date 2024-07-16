@@ -69,8 +69,9 @@ const CreateNickname: React.FC<Props> = (props) => {
                                 autoComplete="off"
                             />
                             <span className="text-gray-500 text-xs">
-                                This use to recover your chats on another web
-                                browser or to access your existing chats.
+                                This will be use to recover your chats on
+                                another web browser or to access your existing
+                                chats.
                             </span>
                             <InputError message={errors.pin} className="mt-2" />
                         </div>
