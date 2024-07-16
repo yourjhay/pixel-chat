@@ -37,7 +37,7 @@ function MessageCreator({ ...props }: Props) {
             />
             <PhotoIcon
                 onClick={() => fileRef.current?.click()}
-                className="w-10 h-10 mr-3 text-blue-500 mt-1 "
+                className="w-10 h-10 mr-1 text-blue-500 mt-1 "
             />
             <div className="w-full">
                 <input
@@ -52,20 +52,20 @@ function MessageCreator({ ...props }: Props) {
                         props.setMessage("message", e.target.value)
                     }
                 />
-
+                {props.processing && (
+                    <div className="text-gray-500 text-xs ml-3">Sending...</div>
+                )}
                 {props.errors.message && (
-                    <div className="text-red-500 text-xs">
+                    <div className="text-red-500 text-xs ml-3">
                         {props.errors.message}
                     </div>
                 )}
                 {props.errors.image && (
-                    <div className="text-red-500 text-xs">
+                    <div className="text-red-500 text-xs ml-3">
                         {props.errors.image}
                     </div>
                 )}
-                {props.processing && (
-                    <div className="text-gray-500 text-xs">Sending...</div>
-                )}
+
                 {props.image && (
                     <div className="relative w-20 bg-gray-200 rounded-lg">
                         <TrashIcon
