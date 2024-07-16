@@ -1,5 +1,4 @@
 import OnlineStatus from "@/Components/OnlineStatus";
-import GuestLayout from "@/Layouts/GuestLayout";
 import { Conversation, Message, PageProps, User } from "@/types";
 import { GlobeAltIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
@@ -124,9 +123,9 @@ export default function Chat({
         );
 
     return (
-        <GuestLayout>
+        <div className="md:max-w-xl md:mt-10 mx-auto">
             <Head title={`Chat ${chatID}`} />
-            <div className="flex flex-row justify-between items-center bg-gray-200 -mx-6 -mt-4 px-6 py-3">
+            <div className="flex flex-row justify-between items-center bg-gray-200  px-2 py-3">
                 <div className="flex flex-row gap-2 items-center">
                     <Link href={route("conversation", { nickname })}>
                         <div className="cursor-pointer p-2 bg-gray-300 rounded-full hover:bg-gray-300">
@@ -155,8 +154,8 @@ export default function Chat({
             <form onSubmit={handleSubmit} method="post">
                 <div
                     ref={listRef}
-                    style={{ height: "70vh" }}
-                    className="flex flex-col-reverse gap-2  overflow-auto no-scrollbar"
+                    style={{ height: "70lvh" }}
+                    className="flex flex-col-reverse gap-2 px-2 overflow-auto no-scrollbar"
                 >
                     <div className="my-2">
                         <div className="text-gray-500 text-xs italic">
@@ -225,7 +224,7 @@ export default function Chat({
                     )}
                 </div>
 
-                <div className="flex flex-row gap-2 mt-3">
+                <div className="flex flex-row gap-2 mt-3 px-2">
                     <div className="grow">
                         <input
                             placeholder="Message"
@@ -250,6 +249,6 @@ export default function Chat({
                     </button>
                 </div>
             </form>
-        </GuestLayout>
+        </div>
     );
 }
