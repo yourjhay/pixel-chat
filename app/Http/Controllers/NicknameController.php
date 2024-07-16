@@ -13,7 +13,7 @@ class NicknameController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nickname' => 'required|string|max:15|min:3|unique:users,nickname',
+            'nickname' => 'required|string|max:15|min:2|unique:users,nickname',
             'pin' => 'required|numeric|digits:4',
         ]);
         $nickname = new User();
