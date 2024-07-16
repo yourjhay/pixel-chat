@@ -10,7 +10,7 @@ interface Props {
     nickname: string | null;
 }
 const CreateNickname: React.FC<Props> = (props) => {
-    const { data, setData, post, reset, errors } = useForm({
+    const { data, setData, post, reset, errors, processing } = useForm({
         nickname: "",
         pin: "",
     });
@@ -84,8 +84,10 @@ const CreateNickname: React.FC<Props> = (props) => {
                                 Login here.
                             </Link>
                         </div>
-                        <PrimaryButton className="mt-4">
-                            Save Nickname & PIN
+                        <PrimaryButton disabled={processing} className="mt-4">
+                            {processing
+                                ? "Saving Account..."
+                                : "Save Nickname & PIN"}
                         </PrimaryButton>
                     </form>
                 </div>

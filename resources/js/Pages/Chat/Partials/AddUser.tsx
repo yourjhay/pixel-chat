@@ -12,7 +12,7 @@ interface Props {
     conversationId: number;
 }
 const NewUser: React.FC<Props> = (props) => {
-    const { data, setData, post, reset, errors } = useForm({
+    const { data, setData, post, reset, errors, processing } = useForm({
         nickname: "",
         conversation_id: props.conversationId,
     });
@@ -64,8 +64,13 @@ const NewUser: React.FC<Props> = (props) => {
                             className="mt-2"
                         />
 
-                        <PrimaryButton className="mt-4 mr-2">
-                            Add {data.nickname}
+                        <PrimaryButton
+                            disabled={processing}
+                            className="mt-4 mr-2"
+                        >
+                            {processing
+                                ? "Adding member..."
+                                : `Add${data.nickname} `}
                         </PrimaryButton>
                         <SecondaryButton onClick={() => setShow(false)}>
                             Cancel

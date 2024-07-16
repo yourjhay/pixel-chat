@@ -8,7 +8,7 @@ import React, { FormEventHandler, useState } from "react";
 
 interface Props {}
 const NewRoom: React.FC<Props> = (props) => {
-    const { data, setData, post, reset, errors } = useForm({
+    const { data, setData, post, reset, errors, processing } = useForm({
         name: "",
         type: "private",
     });
@@ -72,8 +72,8 @@ const NewRoom: React.FC<Props> = (props) => {
                                 This room will be {data.type}{" "}
                             </p>
                         </div>
-                        <PrimaryButton className="mt-4">
-                            Create Room
+                        <PrimaryButton disabled={processing} className="mt-4">
+                            {processing ? "Creating room..." : "Create Room"}
                         </PrimaryButton>
                     </form>
                 </div>
