@@ -15,17 +15,17 @@ class CoversationController extends Controller
 
     public function index(Request $request)
     {
-        $nickname = auth()->user();
+        $user = auth()->user();
 
-        $conversations = Conversation::whereHas('members', function ($query) use ($nickname) {
-            $query->where('user_id', $nickname?->id);
-        })->orWhere('user_id', $nickname?->id)
+        $conversations = Conversation::whereHas('members', function ($query) use ($user) {
+            $query->where('user_id', $user?->id);
+        })->orWhere('user_id', $user?->id)
             ->orWhere('type', 'public')
-            ->orderBy('created_at', 'DESC')->paginate('30');
+            ->orderBy('updated_at', 'DESC')->paginate('30');
 
         return Inertia::render(
             'Conversation/Index',
-            ['conversations' => $conversations, 'nickname' => $nickname?->nickname]
+            ['conversations' => $conversations, 'nickname' => $user?->nickname]
         );
     }
 

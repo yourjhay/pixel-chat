@@ -56,4 +56,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(Message::class);
     }
+
+    public function canJoinRoom(Conversation $conversation)
+    {
+
+        return $this->conversations()
+            ->orWhereHas('members', function ($query) use ($conversation) {
+                $query->where('user_id', $this->id)->orWhere('type', 'public');
+            })->where('id', $conversation->id)->exists();
+    }
 }

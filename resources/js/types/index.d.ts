@@ -33,6 +33,10 @@ export interface Media {
     original_url: string;
     preview_url: string;
     name: string;
+    uuid: string;
+    updated_at: string;
+    file_name: string;
+    mime_type: string;
 }
 export interface Message {
     id?: number;

@@ -2,7 +2,11 @@ import MessageCreator from "@/Components/MessageCreator";
 import Modal from "@/Components/Modal";
 import OnlineStatus from "@/Components/OnlineStatus";
 import { Conversation, Message, PageProps, User } from "@/types";
-import { GlobeAltIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import {
+    GlobeAltIcon,
+    PlayCircleIcon,
+    XCircleIcon,
+} from "@heroicons/react/24/outline";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { Head, Link, useForm } from "@inertiajs/react";
 import moment from "moment";
@@ -26,16 +30,19 @@ export default function Chat({
 }: Props & PageProps) {
     const listRef = React.createRef<HTMLDivElement>();
     const nickname = auth.user?.nickname;
-    const [imageFull, setImageFull] = useState("");
+    const [attachment, setAttachment] = useState<{
+        uri: string;
+        mime: string;
+    } | null>(null);
     const { data, setData, post, processing, errors, reset, progress } =
         useForm<{
             message: string;
             type: "text" | "image";
-            image: File | null;
+            message_attachment: File | null;
         }>({
             message: "",
             type: "text",
-            image: null,
+            message_attachment: null,
         });
 
     const [chats, setMessages] = useState<Message[]>(conversation.messages);
@@ -132,27 +139,38 @@ export default function Chat({
             )
         );
     };
-    console.log(conversation);
+
     return (
         <div
             className="md:max-w-xl md:mt-10 mx-auto"
             style={{ height: "70lvh" }}
         >
             <Modal
-                show={imageFull !== ""}
+                show={attachment !== null}
                 maxWidth="full"
-                onClose={() => setImageFull("")}
+                onClose={() => setAttachment(null)}
             >
-                <div className="flex justify-center relative">
+                <div className="flex justify-center relative bg-gray-900">
                     <XCircleIcon
-                        onClick={() => setImageFull("")}
-                        className="absolute right-3 top-3 w-10 h-10 text-gray-700 p-1 bg-gray-300 border border-pink-300 rounded-full cursor-pointer"
+                        onClick={() => setAttachment(null)}
+                        className="z-10 absolute right-3 top-3 w-10 h-10 text-pink-700 p-1 bg-gray-300 rounded-full cursor-pointer"
                     />
-                    <img
-                        src={imageFull}
-                        className="w-auto "
-                        style={{ maxHeight: "90lvh" }}
-                    />
+
+                    {attachment?.mime.includes("image") && (
+                        <img
+                            src={attachment?.uri}
+                            className="w-auto "
+                            style={{ maxHeight: "85lvh" }}
+                        />
+                    )}
+                    {attachment?.mime.includes("video") && (
+                        <video
+                            controls={true}
+                            src={attachment?.uri}
+                            className="w-auto "
+                            style={{ maxHeight: "85lvh" }}
+                        />
+                    )}
                 </div>
             </Modal>
             <Head title={`Chat ${chatID}`} />
@@ -185,7 +203,7 @@ export default function Chat({
             <div
                 ref={listRef}
                 style={{ height: "100%" }}
-                className="flex  flex-col-reverse gap-2 px-2 overflow-auto no-scrollbar"
+                className="flex flex-col-reverse gap-2 px-2 pt-2 overflow-auto no-scrollbar"
             >
                 <div className="my-2">
                     <div className="text-gray-500 text-xs italic">
@@ -198,7 +216,7 @@ export default function Chat({
                         className="flex flex-row gap-2"
                         style={{
                             justifyContent:
-                                msg.user.nickname === nickname
+                                msg.user?.nickname === nickname
                                     ? "flex-end"
                                     : "flex-start",
                         }}
@@ -207,23 +225,24 @@ export default function Chat({
                             className="rounded-lg p-2 "
                             style={{
                                 backgroundColor:
-                                    msg.user.nickname === nickname
+                                    msg.user?.nickname === nickname
                                         ? "#2f82ed"
                                         : "#e2e8f0",
                                 maxWidth: "60%",
                                 color:
-                                    msg.user.nickname === nickname
+                                    msg.user?.nickname === nickname
                                         ? "white"
                                         : "black",
                             }}
                         >
-                            {msg.user.nickname != nickname && (
+                            {msg.user?.nickname != nickname && (
                                 <div className="flex flex-row gap-1 items-center">
                                     <OnlineStatus
-                                        online={onlines.includes(msg.user.id)}
+                                        online={onlines.includes(msg.user?.id)}
                                     />
                                     <p className="text-xs text-pink-500">
-                                        {msg.user.nickname}{" "}
+                                        {msg.user?.nickname ??
+                                            "Deleted Account"}{" "}
                                     </p>
                                 </div>
                             )}
@@ -231,24 +250,50 @@ export default function Chat({
                                 <p className="text-md">
                                     {msg.message && renderText(msg.message)}
                                 </p>
-                                {msg.media?.length > 0 && (
-                                    <img
-                                        onClick={() =>
-                                            setImageFull(
-                                                msg.media[0].original_url
-                                            )
-                                        }
-                                        src={msg.media[0].preview_url}
-                                        className="w-32 h-32 object-cover rounded-lg cursor-pointer"
-                                    />
-                                )}
+                                {msg.media?.map((media, i) => (
+                                    <div key={i}>
+                                        {media.mime_type.includes("image") && (
+                                            <img
+                                                onClick={() =>
+                                                    setAttachment({
+                                                        uri: media.original_url,
+                                                        mime: media.mime_type,
+                                                    })
+                                                }
+                                                src={media.preview_url}
+                                                className="w-32 h-32 my-1 object-cover rounded-lg cursor-pointer"
+                                            />
+                                        )}
+                                        {media.mime_type.includes("video") && (
+                                            <div className="relative">
+                                                <PlayCircleIcon className="w-10 h-10 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer" />
+                                                <video
+                                                    onClick={() =>
+                                                        setAttachment({
+                                                            uri: media.original_url,
+                                                            mime: media.mime_type,
+                                                        })
+                                                    }
+                                                    preload="metadata"
+                                                    autoPlay={false}
+                                                    src={media.original_url}
+                                                    className="w-32 h-32 my-1 object-cover rounded-lg cursor-pointer"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                             <p
                                 className={`text-xs ${
-                                    msg.user.nickname === nickname
+                                    msg.user?.nickname === nickname
                                         ? "text-gray-100"
                                         : "text-gray-500"
                                 } text-right`}
+                                title={
+                                    "Sent " +
+                                    moment(msg.created_at).format("LLL")
+                                }
                             >
                                 {moment(msg.created_at).fromNow()}
                             </p>
@@ -267,13 +312,13 @@ export default function Chat({
             <form onSubmit={handleSubmit} method="post">
                 <MessageCreator
                     progress={progress}
-                    clearFile={() => setData("image", null)}
-                    image={data.image}
+                    clearFile={() => setData("message_attachment", null)}
+                    attachment={data.message_attachment}
                     onFileChange={(e) => {
                         if (!e.target.files) {
                             return;
                         } else {
-                            setData("image", e.target.files[0]);
+                            setData("message_attachment", e.target.files[0]);
                         }
                     }}
                     isTyping={isTyping}

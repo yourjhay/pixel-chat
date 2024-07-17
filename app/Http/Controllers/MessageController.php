@@ -20,6 +20,10 @@ class MessageController extends Controller
             $query->with('media')->with('user')->orderBy('created_at', 'DESC')->limit(100);
         })->first();
 
+        if (!$request->user()->canJoinRoom($conversation)) {
+            return abort(403);
+        }
+
         return Inertia::render('Chat/Chat', [
             'chatID' => $chatID,
             'conversation' => $conversation
@@ -31,7 +35,7 @@ class MessageController extends Controller
         $request->validate([
             'message' => 'required_if:image,null|nullable|string',
             'type' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10000',
+            'message_attachment' => 'nullable|mimes:jpeg,png,jpg,webp,mp4,mov,webm|max:10240',
         ]);
         try {
             DB::beginTransaction();
@@ -39,16 +43,16 @@ class MessageController extends Controller
             $message->message = $request->message;
             $message->conversation_id = $chatID;
             $message->user_id = auth()->id();
-            $message->type = $request->image === null ? 'text' : 'file';
+            $message->type = $request->message_attachment === null ? 'text' : 'file';
             $message->save();
-            $image = $request->file('image');
+            $image = $request->file('message_attachment');
             if ($image) {
                 $newfilename = uniqid() . '_' . date('Ymdhms.') . $image->extension();
-                $message->addMediaFromRequest('image')
+                $message->addMediaFromRequest('message_attachment')
                     ->usingFileName($newfilename)
-                    ->toMediaCollection('images');
+                    ->toMediaCollection('attachments');
             }
-
+            $message->conversation()->touch();
             MessageEvent::dispatch($chatID, $message->load('user')->load('media'));
             DB::commit();
         } catch (\Throwable $th) {
