@@ -267,15 +267,17 @@ export default function Chat({
                                             />
                                         )}
                                         {media.mime_type.includes("video") && (
-                                            <div className="relative">
+                                            <div
+                                                onClick={() =>
+                                                    setAttachment({
+                                                        uri: media.original_url,
+                                                        mime: media.mime_type,
+                                                    })
+                                                }
+                                                className="relative"
+                                            >
                                                 <PlayCircleIcon className="w-10 h-10 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer" />
                                                 <video
-                                                    onClick={() =>
-                                                        setAttachment({
-                                                            uri: media.original_url,
-                                                            mime: media.mime_type,
-                                                        })
-                                                    }
                                                     preload="metadata"
                                                     autoPlay={false}
                                                     src={media.original_url}
