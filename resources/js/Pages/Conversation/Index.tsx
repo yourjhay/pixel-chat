@@ -76,9 +76,9 @@ function Coversation({ conversations, nickname, auth }: Props & PageProps) {
                         Hey! You're added to{" "}
                         <Link
                             className="text-pink-600 font-bold"
-                            href={route("chat", newConversationNotif.id)}
+                            href={route("chat", newConversationNotif?.id)}
                         >
-                            {newConversationNotif.name}
+                            {newConversationNotif?.name}
                         </Link>
                     </div>
                 )}
