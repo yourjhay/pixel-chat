@@ -42,35 +42,38 @@ export default function Login({
                 </div>
             )}
 
+            <h3 className="text-lg font-medium mb-4">Login</h3>
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="nickname" value="Nickname" />
+                    <InputLabel htmlFor="username" value="Nickname" />
 
                     <TextInput
                         id="nickname"
                         type="text"
-                        name="nickname"
+                        name="username"
                         value={data.nickname}
                         className="mt-1 block w-full"
                         autoComplete="username"
                         isFocused={true}
                         onChange={(e) => setData("nickname", e.target.value)}
+                        placeholder="Enter your nickname"
                     />
 
                     <InputError message={errors.nickname} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="PIN" value="PIN" />
+                    <InputLabel htmlFor="password" value="PIN" />
 
                     <TextInput
-                        id="PIN"
+                        id="password"
                         type="text"
-                        name="PIN"
+                        name="password"
                         value={data.pin}
                         className="mt-1 block w-1/2"
-                        autoComplete="current-PIN"
+                        autoComplete="password"
                         onChange={(e) => setData("pin", e.target.value)}
+                        placeholder="Your 4 Digit PIN"
                     />
 
                     <InputError message={errors.pin} className="mt-2" />

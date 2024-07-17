@@ -35,18 +35,18 @@ const CreateNickname: React.FC<Props> = (props) => {
                     </h2>
                     <form onSubmit={handleSave} method="post">
                         <div>
-                            <InputLabel htmlFor="name" value="Nickname" />
+                            <InputLabel htmlFor="username" value="Nickname" />
                             <TextInput
-                                id="name"
+                                id="username"
                                 type="text"
-                                name="nickname"
+                                name="username"
                                 value={data.nickname}
                                 onChange={(e) =>
                                     setData("nickname", e.target.value)
                                 }
                                 className="mt-1 block w-3/4"
                                 isFocused
-                                placeholder="Enter Nickname"
+                                placeholder="Create a Nickname"
                             />
                             <InputError
                                 message={errors.nickname}
@@ -54,17 +54,16 @@ const CreateNickname: React.FC<Props> = (props) => {
                             />
                         </div>
                         <div className="mt-2">
-                            <InputLabel htmlFor="name" value="PIN" />
+                            <InputLabel htmlFor="password" value="PIN" />
                             <TextInput
                                 minLength={4}
                                 maxLength={4}
-                                id="name"
+                                id="password"
                                 type="text"
                                 name="password"
                                 value={data.pin}
                                 onChange={(e) => setData("pin", e.target.value)}
                                 className="mt-1 block w-3/4 md:w-1/4"
-                                isFocused
                                 placeholder="Create 4 Digit PIN"
                                 autoComplete="off"
                             />
@@ -87,7 +86,7 @@ const CreateNickname: React.FC<Props> = (props) => {
                         <PrimaryButton disabled={processing} className="mt-4">
                             {processing
                                 ? "Saving Account..."
-                                : "Save Nickname & PIN"}
+                                : "Create Nickname & PIN"}
                         </PrimaryButton>
                     </form>
                 </div>
