@@ -1,4 +1,8 @@
-import { PaperAirplaneIcon, PhotoIcon } from "@heroicons/react/24/outline";
+import {
+    DocumentMagnifyingGlassIcon,
+    PaperAirplaneIcon,
+    PhotoIcon,
+} from "@heroicons/react/24/outline";
 import { TrashIcon } from "@heroicons/react/24/solid";
 
 import { AxiosProgressEvent } from "axios";
@@ -71,16 +75,15 @@ function MessageCreator({ ...props }: Props) {
                     </div>
                 )}
                 <div className="relative w-20 bg-gray-200 rounded-lg">
-                    {props.attachment?.type.includes("image") ||
-                        (props.attachment?.type.includes("video") && (
-                            <TrashIcon
-                                className="z-10 w-5 h-5 cursor-pointer text-red-500 absolute top-0 right-0 cursor-pointer"
-                                onClick={() => {
-                                    props.clearFile();
-                                    setFileKey(Math.random().toString(36));
-                                }}
-                            />
-                        ))}
+                    {props.attachment && (
+                        <TrashIcon
+                            className="z-10 w-5 h-5 cursor-pointer text-red-500 absolute top-1 right-1 cursor-pointer"
+                            onClick={() => {
+                                props.clearFile();
+                                setFileKey(Math.random().toString(36));
+                            }}
+                        />
+                    )}
                     {props.progress && (
                         <progress
                             className="w-20 absolute bottom-8 h-2 rounded-lg"
@@ -97,13 +100,18 @@ function MessageCreator({ ...props }: Props) {
                             className="w-20 h-20 rounded-lg object-cover mt-1 mb-1"
                         />
                     )}
-
+                    {props.attachment?.type.includes("image") && (
+                        <img
+                            src={image}
+                            className="w-20 h-20 rounded-lg object-cover mt-1 mb-1"
+                        />
+                    )}
                     {props.attachment &&
-                        props.attachment?.type.includes("image") && (
-                            <img
-                                src={image}
-                                className="w-20 h-20 rounded-lg object-cover mt-1 mb-1"
-                            />
+                        !props.attachment?.type.includes("image") &&
+                        !props.attachment?.type.includes("video") && (
+                            <div className="w-50 h-20  rounded-lg">
+                                <DocumentMagnifyingGlassIcon className="w-10 h-10 text-gray-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                            </div>
                         )}
                 </div>
             </div>

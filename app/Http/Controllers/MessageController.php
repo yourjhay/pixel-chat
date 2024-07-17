@@ -16,13 +16,17 @@ class MessageController extends Controller
 
     public function index(Request $request, $chatID)
     {
+
+
         $conversation = Conversation::where('id', $chatID)->with('messages', function ($query) {
             $query->with('media')->with('user')->orderBy('created_at', 'DESC')->limit(100);
         })->first();
 
-        if (!$request->user()->canJoinRoom($conversation)) {
-            return abort(403);
+
+        if (auth()->user()->canJoinRoom($conversation) == false) {
+            return abort(403, 'You  cannot join this conversation');
         }
+
 
         return Inertia::render('Chat/Chat', [
             'chatID' => $chatID,

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Conversation;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Auth\GenericUser;
 
@@ -16,6 +17,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
-Broadcast::channel('chat.{id}', function ($user, $id) {
-    return $user;
+Broadcast::channel('chat.{id}', function ($user, Conversation $id) {
+    return $user->canJoinRoom($id) ? $user : false;
 });

@@ -125,9 +125,10 @@ export default function Chat({
 
     const renderText = (txt: string) => {
         if (!txt) return;
-        return txt.split(" ").map((part) =>
+        return txt.split(" ").map((part, i) =>
             URL_REGEX.test(part) ? (
                 <a
+                    key={i}
                     target="_blank"
                     className="text-red-900 font-bold"
                     href={part}
@@ -176,7 +177,7 @@ export default function Chat({
             <Head title={`Chat ${chatID}`} />
             <div className="flex flex-row justify-between items-center bg-gray-200  px-2 py-3">
                 <div className="flex flex-row gap-2 items-center">
-                    <Link href={route("conversation", { nickname })}>
+                    <Link href={route("conversation")}>
                         <div className="cursor-pointer p-2 bg-gray-300 rounded-full hover:bg-gray-300">
                             <ChevronLeftIcon className="w-5 h-5" />
                         </div>
@@ -254,6 +255,7 @@ export default function Chat({
                                     <div key={i}>
                                         {media.mime_type.includes("image") && (
                                             <img
+                                                loading="lazy"
                                                 onClick={() =>
                                                     setAttachment({
                                                         uri: media.original_url,
