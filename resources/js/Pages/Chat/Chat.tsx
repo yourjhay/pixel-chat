@@ -262,7 +262,11 @@ export default function Chat({
                                                         mime: media.mime_type,
                                                     })
                                                 }
-                                                src={media.preview_url}
+                                                src={
+                                                    media.preview_url == ""
+                                                        ? "https://d1ktwvmsnoqr1j.cloudfront.net/placeholder.jpg"
+                                                        : media.preview_url
+                                                }
                                                 className="w-32 h-32 my-1 object-cover rounded-lg cursor-pointer"
                                             />
                                         )}
