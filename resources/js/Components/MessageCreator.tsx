@@ -56,6 +56,7 @@ function MessageCreator({ ...props }: Props) {
                     className="input border-none focus:ring-0 w-full text-lg rounded-lg"
                     type="text"
                     name="message"
+                    autoFocus
                     value={props.message}
                     onChange={(e) =>
                         props.setMessage("message", e.target.value)
