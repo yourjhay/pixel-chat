@@ -11,7 +11,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { Head, Link, useForm } from "@inertiajs/react";
-import axios from "axios";
 import moment from "moment";
 import React, { FormEventHandler, useEffect, useState } from "react";
 import NewUser from "./Partials/AddUser";
@@ -120,20 +119,13 @@ export default function Chat({
 
     const handleSubmit: FormEventHandler = async (e) => {
         e.preventDefault();
-        await axios
-            .post(route("chat.send", chatID), {
-                message: data.message,
-                type: data.type,
-                message_attachment: data.message_attachment,
-            })
-            .then(() => {
+
+        post(route("chat.send", chatID), {
+            preserveScroll: true,
+            onSuccess: () => {
                 reset();
-            });
-        // post(route("chat.send", chatID), {
-        //     onSuccess: () => {
-        //         reset();
-        //     },
-        // });
+            },
+        });
     };
 
     const isTyping = () => {
