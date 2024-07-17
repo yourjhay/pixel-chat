@@ -45,7 +45,7 @@ function Coversation({ conversations, nickname, auth }: Props & PageProps) {
         );
 
         return () => {
-            window.Echo.leave(`user-rooms.${auth.user.id}`);
+            window.Echo.leave(`user-rooms.${auth.user?.id}`);
         };
     }, [auth]);
 
