@@ -37,7 +37,7 @@ function Coversation({ conversations, nickname, auth }: Props & PageProps) {
                 },
             ]);
         });
-        window.Echo.private(`user-rooms.${auth.user.id}`).listen(
+        window.Echo.private(`user-rooms.${auth.user?.id}`).listen(
             "UserAddedToRoom",
             (e: { conversation: Conversation }) => {
                 setNewConversationNotif(e.conversation);
