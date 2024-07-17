@@ -37,15 +37,20 @@ function Coversation({ conversations, nickname, auth }: Props & PageProps) {
                 },
             ]);
         });
-        window.Echo.private(`user-rooms.${auth.user?.id}`).listen(
-            "UserAddedToRoom",
-            (e: { conversation: Conversation }) => {
-                setNewConversationNotif(e.conversation);
-            }
-        );
+
+        if (auth.user) {
+            window.Echo.private(`user-rooms.${auth.user.id}`).listen(
+                "UserAddedToRoom",
+                (e: { conversation: Conversation }) => {
+                    setNewConversationNotif(e.conversation);
+                }
+            );
+        }
 
         return () => {
-            window.Echo.leave(`user-rooms.${auth.user?.id}`);
+            if (auth.user) {
+                window.Echo.leave(`user-rooms.${auth.user.id}`);
+            }
         };
     }, [auth]);
 
