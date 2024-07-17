@@ -31,6 +31,8 @@ export default function Chat({
     auth,
 }: Props & PageProps) {
     const listRef = React.createRef<HTMLDivElement>();
+    const bottomRef = React.createRef<HTMLDivElement>();
+
     const nickname = auth.user?.nickname;
     const [attachment, setAttachment] = useState<{
         uri: string;
@@ -101,6 +103,12 @@ export default function Chat({
         () => {
             if (listRef.current) {
                 listRef.current?.firstElementChild?.scrollIntoView({
+                    behavior: "smooth",
+                });
+            }
+
+            if (bottomRef.current) {
+                bottomRef.current?.scrollIntoView({
                     behavior: "smooth",
                 });
             }
@@ -345,6 +353,7 @@ export default function Chat({
                     setMessage={setData}
                 />
             </form>
+            <div style={{ float: "left", clear: "both" }} ref={bottomRef}></div>
         </div>
     );
 }
