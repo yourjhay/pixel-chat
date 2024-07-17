@@ -41,4 +41,11 @@ class ConversationMemberController extends Controller
         $member->load('conversation');
         UserAddedToRoom::dispatch($user, $member->conversation);
     }
+
+    public function leave($chatID)
+    {
+        $member = ConversationMember::where('conversation_id', $chatID)->where('user_id', auth()->id())->first();
+        $member->delete();
+        return redirect()->route('conversation');
+    }
 }

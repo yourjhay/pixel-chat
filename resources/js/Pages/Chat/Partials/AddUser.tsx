@@ -31,6 +31,7 @@ const NewUser: React.FC<Props> = (props) => {
     return (
         <div>
             <div
+                title="Add new user to this room"
                 className="cursor-pointer p-2 bg-gray-300 rounded-full hover:bg-gray-300"
                 onClick={() => setShow(true)}
             >

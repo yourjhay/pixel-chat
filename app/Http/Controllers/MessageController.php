@@ -17,19 +17,31 @@ class MessageController extends Controller
     public function index(Request $request, $chatID)
     {
 
-
         $conversation = Conversation::where('id', $chatID)->with('messages', function ($query) {
             $query->with('media')->with('user')->orderBy('created_at', 'DESC')->limit(100);
         })->first();
-
 
         if (auth()->user()->canJoinRoom($conversation) == false) {
             return abort(403, 'You  cannot join this conversation');
         }
 
-
         return Inertia::render('Chat/Chat', [
             'chatID' => $chatID,
+            'conversation' => $conversation
+        ]);
+    }
+
+    public function details($chatID)
+    {
+        $conversation = Conversation::where('id', $chatID)->with('members', function ($query) {
+            $query->with('user');
+        })->first();
+
+        if (auth()->user()->canJoinRoom($conversation) == false) {
+            return abort(403, 'You not allowed to check this conversation');
+        }
+
+        return Inertia::render('Chat/ChatDetails', [
             'conversation' => $conversation
         ]);
     }

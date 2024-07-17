@@ -59,6 +59,6 @@ class User extends Authenticatable
 
     public function canJoinRoom(Conversation $conversation)
     {
-        return $conversation->members()->where('user_id', $this->id)->exists()  ||  $conversation->type == 'public'  ||  $conversation->user_id == $this->id;
+        return $conversation->members()->where('user_id', $this->id)->exists()  ||  $conversation->type == 'public';
     }
 }

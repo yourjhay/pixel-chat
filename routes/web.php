@@ -33,8 +33,10 @@ Route::post('/nickname', [NicknameController::class, 'store'])->name('nickname')
 Route::middleware('auth')->group(function () {
     Route::post('/conversation', [CoversationController::class, 'store'])->name('conversation.new');
     Route::post('/coversation/add-user', [ConversationMemberController::class, 'store'])->name('conversation.user.add');
+    Route::post('/coversation/leave/{chatID}', [ConversationMemberController::class, 'leave'])->name('conversation.leave');
     Route::get('/chat/{chatID}', [MessageController::class, 'index'])->name('chat');
     Route::post('/chat/{chatID}', [MessageController::class, 'store'])->name('chat.send')->middleware('throttle:10,1');
+    Route::get('/chat/details/{chatID}', [MessageController::class, 'details'])->name('chat.details');
 });
 
 require __DIR__ . '/auth.php';

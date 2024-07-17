@@ -19,7 +19,7 @@ class CoversationController extends Controller
 
         $conversations = Conversation::whereHas('members', function ($query) use ($user) {
             $query->where('user_id', $user?->id);
-        })->orWhere('user_id', $user?->id)
+        })
             ->orWhere('type', 'public')
             ->orderBy('updated_at', 'DESC')->paginate('30');
 

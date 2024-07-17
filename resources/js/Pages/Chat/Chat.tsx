@@ -5,6 +5,7 @@ import TypingIndicator from "@/Components/TypingIndicator";
 import useDebounce from "@/Hooks/useDebounce";
 import { Conversation, Message, PageProps, User } from "@/types";
 import {
+    Cog6ToothIcon,
     GlobeAltIcon,
     PlayCircleIcon,
     XCircleIcon,
@@ -13,7 +14,6 @@ import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { Head, Link, useForm } from "@inertiajs/react";
 import moment from "moment";
 import React, { FormEventHandler, useEffect, useState } from "react";
-import NewUser from "./Partials/AddUser";
 
 interface Props {
     chatID: string;
@@ -82,7 +82,7 @@ export default function Chat({
                         user: "",
                         typing: false,
                     });
-                }, 1000);
+                }, 1500);
             })
             .listen("MessageEvent", (e: { message: Message }) => {
                 setTyping({
@@ -123,14 +123,12 @@ export default function Chat({
     };
 
     const isTyping = () => {
-        if (conversation.type === "private") {
-            setTimeout(function () {
-                channel.whisper("typing", {
-                    user: auth.user.nickname,
-                    typing: true,
-                });
-            }, 500);
-        }
+        setTimeout(function () {
+            channel.whisper("typing", {
+                user: auth.user.nickname,
+                typing: true,
+            });
+        }, 500);
     };
     const URL_REGEX =
         /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
@@ -156,8 +154,9 @@ export default function Chat({
     return (
         <div
             className="md:max-w-xl  mx-auto flex flex-col"
-            style={{ height: "100svh" }}
+            style={{ height: "98.5svh" }}
         >
+            <Head title={`${conversation.name}`} />
             <Modal
                 show={attachment !== null}
                 maxWidth="full"
@@ -186,7 +185,6 @@ export default function Chat({
                     )}
                 </div>
             </Modal>
-            <Head title={`${conversation.name}`} />
             <div className="flex flex-row justify-between items-center bg-gray-200  px-2 py-3">
                 <div className="flex flex-row gap-2 items-center">
                     <Link href={route("conversation")}>
@@ -196,9 +194,11 @@ export default function Chat({
                     </Link>
 
                     <div className="flex flex-col ">
-                        <h2 className="text-xl font-bold text-gray-500 ">
-                            {conversation.name}
-                        </h2>
+                        <Link href={route("chat.details", conversation.id)}>
+                            <h2 className="text-xl font-bold text-gray-500 ">
+                                {conversation.name}
+                            </h2>
+                        </Link>
                         <span className="text-gray-500 text-sm ">
                             {onlines.length}{" "}
                             {onlines.length === 1 ? "user" : "users"} online
@@ -206,7 +206,9 @@ export default function Chat({
                     </div>
                 </div>
                 {conversation.type === "private" ? (
-                    <NewUser conversationId={conversation.id} />
+                    <Link href={route("chat.details", conversation.id)}>
+                        <Cog6ToothIcon className="w-8 h-8 text-gray-500" />
+                    </Link>
                 ) : (
                     <p className="flex flex-row items-center text-gray-500">
                         Public{" "}

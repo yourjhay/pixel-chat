@@ -15,10 +15,18 @@ export type PageProps<
 
 export interface Conversation {
     id: number;
+    user_id: number;
     name: string;
     type: "public" | "private";
     created_at: string;
     messages: Message[];
+    members: {
+        id: number;
+        conversation_id: number;
+        user_id: number;
+        user: User;
+        created_at: string;
+    }[];
 }
 export interface Nickname {
     id: number;

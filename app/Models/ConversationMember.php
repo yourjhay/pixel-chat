@@ -13,4 +13,9 @@ class ConversationMember extends Model
     {
         return $this->belongsTo(Conversation::class);
     }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
 }
