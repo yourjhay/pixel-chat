@@ -9,6 +9,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Image\Enums\Fit;
 
+
+
 class Message extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;
@@ -31,6 +33,12 @@ class Message extends Model implements HasMedia
         $this
             ->addMediaConversion('preview')
             ->fit(Fit::Contain, 300, 300)
+            ->optimize()
             ->sharpen(10);
+
+        $this->addMediaConversion('thumb')
+            ->width(368)
+            ->height(232)
+            ->performOnCollections('videos');
     }
 }
