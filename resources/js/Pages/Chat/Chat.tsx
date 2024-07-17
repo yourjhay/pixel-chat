@@ -1,6 +1,8 @@
 import MessageCreator from "@/Components/MessageCreator";
 import Modal from "@/Components/Modal";
 import OnlineStatus from "@/Components/OnlineStatus";
+import TypingIndicator from "@/Components/TypingIndicator";
+import useDebounce from "@/Hooks/useDebounce";
 import { Conversation, Message, PageProps, User } from "@/types";
 import {
     GlobeAltIcon,
@@ -78,7 +80,7 @@ export default function Chat({
                         user: "",
                         typing: false,
                     });
-                }, 600);
+                }, 1000);
             })
             .listen("MessageEvent", (e: { message: Message }) => {
                 setTyping({
@@ -95,11 +97,17 @@ export default function Chat({
         };
     }, []);
 
-    useEffect(() => {
-        if (listRef.current) {
-            listRef.current?.firstElementChild?.scrollIntoView();
-        }
-    }, [chats]);
+    useDebounce(
+        () => {
+            if (listRef.current) {
+                listRef.current?.firstElementChild?.scrollIntoView({
+                    behavior: "smooth",
+                });
+            }
+        },
+        [chats],
+        50
+    );
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -143,8 +151,8 @@ export default function Chat({
 
     return (
         <div
-            className="md:max-w-xl md:mt-10 mx-auto"
-            style={{ height: "70lvh" }}
+            className="md:max-w-xl  mx-auto flex flex-col"
+            style={{ height: "98lvh" }}
         >
             <Modal
                 show={attachment !== null}
@@ -174,12 +182,12 @@ export default function Chat({
                     )}
                 </div>
             </Modal>
-            <Head title={`Chat ${chatID}`} />
+            <Head title={`${conversation.name}`} />
             <div className="flex flex-row justify-between items-center bg-gray-200  px-2 py-3">
                 <div className="flex flex-row gap-2 items-center">
                     <Link href={route("conversation")}>
                         <div className="cursor-pointer p-2 bg-gray-300 rounded-full hover:bg-gray-300">
-                            <ChevronLeftIcon className="w-5 h-5" />
+                            <ChevronLeftIcon className="w-5 h-5 text-blue-500 " />
                         </div>
                     </Link>
 
@@ -197,18 +205,19 @@ export default function Chat({
                     <NewUser conversationId={conversation.id} />
                 ) : (
                     <p className="flex flex-row items-center text-gray-500">
-                        Public <GlobeAltIcon className="w-4 h-4 ml-2" />
+                        Public{" "}
+                        <GlobeAltIcon className="w-6 h-6 ml-2 text-blue-500" />
                     </p>
                 )}
             </div>
             <div
                 ref={listRef}
-                style={{ height: "100%" }}
-                className="flex flex-col-reverse gap-2 px-2 pt-2 overflow-auto no-scrollbar"
+                //style={{ height: "50%" }}
+                className="flex flex-col-reverse gap-2 px-2 h-full pt-2 overflow-auto no-scrollbar"
             >
                 <div className="my-2">
-                    <div className="text-gray-500 text-xs italic">
-                        {typing.user && `${typing.user} is typing...`}
+                    <div className="text-gray-500 text-xs italic px-1">
+                        {typing.user && <TypingIndicator user={typing.user} />}
                     </div>
                 </div>
                 {chats.slice(0, 100).map((msg) => (

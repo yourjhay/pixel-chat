@@ -34,7 +34,7 @@ const NewUser: React.FC<Props> = (props) => {
                 className="cursor-pointer p-2 bg-gray-300 rounded-full hover:bg-gray-300"
                 onClick={() => setShow(true)}
             >
-                <UserPlusIcon className="w-5 h-5" />
+                <UserPlusIcon className="w-5 h-5 text-blue-500" />
             </div>
             <Modal show={show} onClose={() => setShow(false)}>
                 <div className="p-6">

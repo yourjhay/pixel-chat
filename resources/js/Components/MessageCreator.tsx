@@ -61,9 +61,7 @@ function MessageCreator({ ...props }: Props) {
                         props.setMessage("message", e.target.value)
                     }
                 />
-                {props.processing && (
-                    <div className="text-gray-500 text-xs ml-3">Sending...</div>
-                )}
+
                 {props.errors.message && (
                     <div className="text-red-500 text-xs ml-3">
                         {props.errors.message}
@@ -121,7 +119,12 @@ function MessageCreator({ ...props }: Props) {
                     props.processing || (!props.message && !props.attachment)
                 }
             >
-                <PaperAirplaneIcon className="w-8 h-8 text-blue-700 mt-1" />
+                <PaperAirplaneIcon
+                    style={{ marginTop: "6px" }}
+                    className={`${
+                        props.processing && "animate-bounce"
+                    } w-8 h-8 text-blue-500 `}
+                />
             </button>
         </div>
     );
