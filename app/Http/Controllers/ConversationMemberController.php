@@ -15,7 +15,7 @@ class ConversationMemberController extends Controller
     {
 
         $request->validate([
-            'nickname' => 'required|string|min:3|max:15',
+            'nickname' => 'required|string|min:2|max:15',
             'conversation_id' => 'required|numeric',
         ]);
 
