@@ -156,7 +156,7 @@ export default function Chat({
     return (
         <div
             className="md:max-w-xl  mx-auto flex flex-col"
-            style={{ height: "95svh" }}
+            style={{ height: "100svh" }}
         >
             <Modal
                 show={attachment !== null}
