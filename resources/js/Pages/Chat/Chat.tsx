@@ -106,12 +106,6 @@ export default function Chat({
                     behavior: "smooth",
                 });
             }
-
-            if (bottomRef.current) {
-                bottomRef.current?.scrollIntoView({
-                    behavior: "smooth",
-                });
-            }
         },
         [chats],
         50
