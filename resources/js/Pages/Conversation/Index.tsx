@@ -24,6 +24,8 @@ interface Unread {
 }
 function Coversation({ conversations, nickname, auth }: Props & PageProps) {
     const [unread, setUnread] = useState<Unread[]>([]);
+    const [newConversationNotif, setNewConversationNotif] =
+        useState<Conversation>();
 
     useEffect(() => {
         conversations.data.map((conversation) => {
@@ -35,6 +37,16 @@ function Coversation({ conversations, nickname, auth }: Props & PageProps) {
                 },
             ]);
         });
+        window.Echo.private(`user-rooms.${auth.user.id}`).listen(
+            "UserAddedToRoom",
+            (e: { conversation: Conversation }) => {
+                setNewConversationNotif(e.conversation);
+            }
+        );
+
+        return () => {
+            window.Echo.leave(`user-rooms.${auth.user.id}`);
+        };
     }, [auth]);
 
     return (
@@ -59,6 +71,17 @@ function Coversation({ conversations, nickname, auth }: Props & PageProps) {
                 style={{ maxHeight: "70vh" }}
                 className="flex flex-col gap-2 overflow-auto py-4"
             >
+                {newConversationNotif && (
+                    <div className="p-2 bg-green-200 shadow rounded-lg text-gray-600">
+                        Hey! You're added to{" "}
+                        <Link
+                            className="text-pink-600 font-bold"
+                            href={route("chat", newConversationNotif.id)}
+                        >
+                            {newConversationNotif.name}
+                        </Link>
+                    </div>
+                )}
                 {conversations.data.map((conversation) => (
                     <Link
                         key={conversation.id}

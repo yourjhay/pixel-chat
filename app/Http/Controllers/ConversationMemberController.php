@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserAddedToRoom;
 use App\Models\Conversation;
 use App\Models\ConversationMember;
 use App\Models\User;
@@ -37,5 +38,7 @@ class ConversationMemberController extends Controller
         $member->conversation_id = $request->conversation_id;
         $member->user_id = $user->id;
         $member->save();
+        $member->load('conversation');
+        UserAddedToRoom::dispatch($user, $member->conversation);
     }
 }

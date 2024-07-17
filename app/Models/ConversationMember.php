@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class ConversationMember extends Model
 {
     use HasFactory;
+
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class);
+    }
 }
