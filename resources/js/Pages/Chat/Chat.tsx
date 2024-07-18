@@ -1,5 +1,6 @@
 import MessageCreator from "@/Components/MessageCreator";
 import Modal from "@/Components/Modal";
+import NetworkStatus from "@/Components/NetworkStatus";
 import OnlineStatus from "@/Components/OnlineStatus";
 import TypingIndicator from "@/Components/TypingIndicator";
 import useHelper from "@/Hooks/Helper";
@@ -22,7 +23,6 @@ import { Head, Link, useForm } from "@inertiajs/react";
 import { PresenceChannel } from "laravel-echo";
 import moment from "moment";
 import React, { FormEventHandler, useEffect, useState } from "react";
-
 interface Props {
     chatID: string;
     conversation: Conversation;
@@ -116,6 +116,7 @@ export default function Chat({
 
     const handleSubmit: FormEventHandler = async (e) => {
         e.preventDefault();
+
         post(route("chat.send", chatID), {
             preserveScroll: true,
             onSuccess: () => {
@@ -135,9 +136,10 @@ export default function Chat({
 
     return (
         <div
-            className="md:max-w-xl  mx-auto flex flex-col"
+            className="relative md:max-w-xl  mx-auto flex flex-col"
             style={{ height: "100svh" }}
         >
+            <NetworkStatus />
             <Head title={`${conversation.name}`} />
             <Modal
                 show={attachment !== null}
