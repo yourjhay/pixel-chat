@@ -35,7 +35,7 @@ function MessageCreator({ ...props }: Props) {
     }, [props.attachment]);
 
     return (
-        <div className="flex flex-row items-start  grow p-1 mx-2 border border-blue-500 rounded-lg">
+        <div className="flex my-2 flex-row items-start  grow p-1 mx-2 border border-blue-500 rounded-lg">
             <input
                 accept="video/*,image/jpeg,image/png,image/gif,image/webp,image/jpg"
                 onChange={props.onFileChange}
@@ -46,7 +46,9 @@ function MessageCreator({ ...props }: Props) {
             />
             <PhotoIcon
                 onClick={() => fileRef.current?.click()}
-                className="w-10 h-10 mr-1 text-blue-500 mt-1 "
+                className={`cursor-pointer w-10 h-10 mr-1 ${
+                    !props.attachment ? "text-blue-500" : "text-pink-500"
+                } mt-1 `}
             />
             <div className="w-full">
                 <input
@@ -122,9 +124,11 @@ function MessageCreator({ ...props }: Props) {
             >
                 <PaperAirplaneIcon
                     style={{ marginTop: "6px" }}
-                    className={`${
-                        props.processing && "animate-bounce"
-                    } w-8 h-8 text-blue-500 `}
+                    className={`hover:animate-pulse ${
+                        props.processing
+                            ? "animate-bounce text-pink-500"
+                            : "text-blue-500"
+                    } cursor-pointer w-8 h-8  `}
                 />
             </button>
         </div>

@@ -56,21 +56,21 @@ function Coversation({ conversations, nickname, auth }: Props & PageProps) {
 
     return (
         <GuestLayout>
+            <Head title="Coversations" />
             <CreateNickname nickname={auth.user?.nickname} />
             <div className="flex flex-row-reverse justify-between items-center">
                 {auth.user?.id && <NewRoom />}
                 {nickname && (
                     <Link href={route("profile.edit")}>
                         <div className="flex flex-row gap-2 items-center cursor-pointer text-indigo-500">
-                            <UserCircleIcon className="w-6 h-6" />
-                            <p className="text-lg  font-bold">
+                            <UserCircleIcon className="w-7 h-7" />
+                            <p className="text-2xl font-bold">
                                 {auth.user.nickname}
                             </p>
                         </div>
                     </Link>
                 )}
             </div>
-            <Head title="Coversations" />
             <h2 className="text-xl font-bold text-gray-500 my-3">Chat Rooms</h2>
             <div
                 style={{ maxHeight: "70vh" }}

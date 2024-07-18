@@ -56,3 +56,9 @@ export interface Message {
     type: "text" | "file";
     media: Media[];
 }
+
+export interface MessageRequest {
+    message: string;
+    type: "text" | "image";
+    message_attachment: File | null;
+}

@@ -2,8 +2,15 @@ import MessageCreator from "@/Components/MessageCreator";
 import Modal from "@/Components/Modal";
 import OnlineStatus from "@/Components/OnlineStatus";
 import TypingIndicator from "@/Components/TypingIndicator";
+import useHelper from "@/Hooks/Helper";
 import useDebounce from "@/Hooks/useDebounce";
-import { Conversation, Message, PageProps, User } from "@/types";
+import {
+    Conversation,
+    Message,
+    MessageRequest,
+    PageProps,
+    User,
+} from "@/types";
 import {
     Cog6ToothIcon,
     GlobeAltIcon,
@@ -12,6 +19,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { Head, Link, useForm } from "@inertiajs/react";
+import { PresenceChannel } from "laravel-echo";
 import moment from "moment";
 import React, { FormEventHandler, useEffect, useState } from "react";
 
@@ -32,18 +40,14 @@ export default function Chat({
 }: Props & PageProps) {
     const listRef = React.createRef<HTMLDivElement>();
     const bottomRef = React.createRef<HTMLDivElement>();
-
+    const { renderText } = useHelper();
     const nickname = auth.user?.nickname;
     const [attachment, setAttachment] = useState<{
         uri: string;
         mime: string;
     } | null>(null);
     const { data, setData, post, processing, errors, reset, progress } =
-        useForm<{
-            message: string;
-            type: "text" | "image";
-            message_attachment: File | null;
-        }>({
+        useForm<MessageRequest>({
             message: "",
             type: "text",
             message_attachment: null,
@@ -55,11 +59,11 @@ export default function Chat({
         user: "",
         typing: false,
     });
-    const [channel, setChannel] = useState<any>(null);
+    const [channel, setChannel] = useState<PresenceChannel>();
 
     let time: any;
     useEffect(() => {
-        const channel = window.Echo.join(`chat.${chatID}`)
+        const current_channel = window.Echo.join(`chat.${chatID}`)
             .here((users: User[]) => {
                 users.map((user) => {
                     setOnlines((prev) => [...prev, user.id]);
@@ -89,11 +93,10 @@ export default function Chat({
                     user: "",
                     typing: false,
                 });
-                console.log(e.message);
                 setMessages((prev) => [e.message, ...prev]);
             });
 
-        setChannel(channel);
+        setChannel(current_channel as PresenceChannel);
         return () => {
             window.Echo.leave(`chat.${chatID}`);
         };
@@ -113,7 +116,6 @@ export default function Chat({
 
     const handleSubmit: FormEventHandler = async (e) => {
         e.preventDefault();
-
         post(route("chat.send", chatID), {
             preserveScroll: true,
             onSuccess: () => {
@@ -124,37 +126,17 @@ export default function Chat({
 
     const isTyping = () => {
         setTimeout(function () {
-            channel.whisper("typing", {
+            channel?.whisper("typing", {
                 user: auth.user.nickname,
                 typing: true,
             });
         }, 500);
     };
-    const URL_REGEX =
-        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
-
-    const renderText = (txt: string) => {
-        if (!txt) return;
-        return txt.split(" ").map((part, i) =>
-            URL_REGEX.test(part) ? (
-                <a
-                    key={i}
-                    target="_blank"
-                    className="text-red-900 font-bold"
-                    href={part}
-                >
-                    {part}{" "}
-                </a>
-            ) : (
-                part + " "
-            )
-        );
-    };
 
     return (
         <div
             className="md:max-w-xl  mx-auto flex flex-col"
-            style={{ height: "98.5svh" }}
+            style={{ height: "100svh" }}
         >
             <Head title={`${conversation.name}`} />
             <Modal
@@ -185,17 +167,17 @@ export default function Chat({
                     )}
                 </div>
             </Modal>
-            <div className="flex flex-row justify-between items-center bg-gray-200  px-2 py-3">
+            <div className="flex flex-row justify-between rounded-xl items-center bg-gray-200  px-2 py-3">
                 <div className="flex flex-row gap-2 items-center">
                     <Link href={route("conversation")}>
                         <div className="cursor-pointer p-2 bg-gray-300 rounded-full hover:bg-gray-300">
-                            <ChevronLeftIcon className="w-5 h-5 text-blue-500 " />
+                            <ChevronLeftIcon className="w-5 h-5 hover:scale-110 text-blue-500 " />
                         </div>
                     </Link>
 
                     <div className="flex flex-col ">
                         <Link href={route("chat.details", conversation.id)}>
-                            <h2 className="text-xl font-bold text-gray-500 ">
+                            <h2 className="text-xl font-bold text-blue-500 ">
                                 {conversation.name}
                             </h2>
                         </Link>
@@ -206,13 +188,16 @@ export default function Chat({
                     </div>
                 </div>
                 {conversation.type === "private" ? (
-                    <Link href={route("chat.details", conversation.id)}>
+                    <Link
+                        href={route("chat.details", conversation.id)}
+                        className="hover:animate-spin"
+                    >
                         <Cog6ToothIcon className="w-8 h-8 text-gray-500" />
                     </Link>
                 ) : (
-                    <p className="flex flex-row items-center text-gray-500">
+                    <p className="flex flex-row items-center text-pink-500">
                         Public{" "}
-                        <GlobeAltIcon className="w-6 h-6 ml-2 text-blue-500" />
+                        <GlobeAltIcon className="w-6 h-6 ml-2 text-pink-500" />
                     </p>
                 )}
             </div>
@@ -256,13 +241,13 @@ export default function Chat({
                                     <OnlineStatus
                                         online={onlines.includes(msg.user?.id)}
                                     />
-                                    <p className="text-xs text-pink-500">
+                                    <p className="text-sm text-pink-500">
                                         {msg.user?.nickname ??
-                                            "Deleted Account"}{" "}
+                                            "Deleted Account"}
                                     </p>
                                 </div>
                             )}
-                            <div className="w-full text-balance break-words">
+                            <div className="w-full  break-words">
                                 <p className="text-md">
                                     {msg.message && renderText(msg.message)}
                                 </p>
