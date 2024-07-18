@@ -12,7 +12,7 @@ export default function useHelper() {
                     className="text-pink-800 font-bold"
                     href={part}
                 >
-                    {part}
+                    {part}{" "}
                 </a>
             ) : (
                 part + " "
