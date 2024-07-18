@@ -155,7 +155,7 @@ export default function Chat({
                     {attachment?.mime.includes("image") && (
                         <img
                             src={attachment?.uri}
-                            className="w-auto "
+                            className="w-auto min-w-96"
                             style={{ maxHeight: "85lvh" }}
                         />
                     )}
