@@ -69,9 +69,11 @@ export default function UpdateProfileInformation({
                         isFocused
                         autoComplete="name"
                     />
-                    <p className="mt-2 text-sm text-gray-600">
-                        Email is required to allow password reset
-                    </p>
+                    {!data.email && (
+                        <p className="mt-2 text-sm text-gray-600">
+                            Email is required to allow password reset
+                        </p>
+                    )}
                     <InputError className="mt-2" message={errors.email} />
                 </div>
 
