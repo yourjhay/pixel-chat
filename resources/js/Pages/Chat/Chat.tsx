@@ -213,7 +213,7 @@ export default function Chat({
                         {typing.user && <TypingIndicator user={typing.user} />}
                     </div>
                 </div>
-                {chats.slice(0, 100).map((msg) => (
+                {chats.slice(0, 500).map((msg) => (
                     <div
                         key={msg.id}
                         className="flex flex-row gap-2"
