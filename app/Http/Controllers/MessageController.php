@@ -18,7 +18,7 @@ class MessageController extends Controller
     {
 
         $conversation = Conversation::where('id', $chatID)->with('messages', function ($query) {
-            $query->with('media')->with('user')->orderBy('created_at', 'DESC')->limit(100);
+            $query->with('media')->with('user')->orderBy('created_at', 'DESC')->limit(500);
         })->first();
 
         if (auth()->user()->canJoinRoom($conversation) == false) {
