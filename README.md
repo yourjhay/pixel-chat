@@ -1,66 +1,281 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Pixel Chat
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Real-time group chat built on **Laravel 11**, **Inertia.js**, and **React** (TypeScript). Users browse conversations, open a room, and exchange messages with **Laravel Echo** and **Pusher** for live updates. **Laravel Breeze** provides authentication; **Spatie Laravel Media Library** handles attachments on messages (with image/video conversions).
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+| Layer | Technology |
+|--------|------------|
+| Backend | PHP 8.2+, Laravel 11 |
+| Frontend | React 18, TypeScript, Vite 5 |
+| Bridge | Inertia.js, Ziggy (named routes in JS) |
+| Styling | Tailwind CSS, Headless UI, Heroicons |
+| Real-time | Pusher, Laravel Echo |
+| Auth | Laravel Sanctum (session), Breeze controllers |
+| Media | spatie/laravel-medialibrary, php-ffmpeg (conversions) |
+| Optional storage | AWS S3 (`league/flysystem-aws-s3-v3`) |
+| Tests | Pest, Laravel test utilities |
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Architecture
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```mermaid
+flowchart LR
+  Browser[Browser]
+  Vite[Vite / React pages]
+  Inertia[Inertia middleware]
+  Laravel[Laravel routes + controllers]
+  DB[(MySQL)]
+  Pusher[Pusher]
+  Echo[Laravel Echo]
 
-## Learning Laravel
+  Browser --> Vite
+  Vite --> Inertia
+  Inertia --> Laravel
+  Laravel --> DB
+  Browser --> Echo
+  Echo --> Pusher
+  Laravel --> Pusher
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Server-rendered shell**: `resources/views/app.blade.php` loads the Vite bundle; Inertia swaps page components without full reloads.
+- **Pages** live under `resources/js/Pages/**` and map 1:1 to `Inertia::render('…')` names (e.g. `Pages/Conversation/Index.tsx` → `Conversation/Index`).
+- **Shared props** (e.g. `auth.user`) are set in `app/Http/Middleware/HandleInertiaRequests.php`.
+- **Broadcasting** is authorized in `routes/channels.php` (`chat.{id}`, `user-rooms.{id}`, user private channel). Echo is configured in `resources/js/bootstrap.ts` from `VITE_*` Pusher variables.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Folder structure
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Top level
 
-## Laravel Sponsors
+```
+pixel-chat/
+├── app/                    # Application code (models, HTTP, events, helpers)
+├── bootstrap/              # `app.php` — framework bootstrap, middleware, routes
+├── config/                 # Laravel & package config (app, database, broadcasting, media-library, …)
+├── database/
+│   ├── factories/
+│   ├── migrations/
+│   └── seeders/
+├── docker/                 # PHP / MySQL images and related Docker assets
+├── public/                 # Web root (`index.php`, static assets, compiled frontend)
+├── resources/
+│   ├── css/
+│   ├── js/                 # Inertia + React (TypeScript) source
+│   └── views/              # Blade templates (Inertia shell)
+├── routes/                 # `web.php`, `auth.php`, `channels.php`, `console.php`
+├── storage/                # Logs, cache, sessions, uploads (runtime; not all tracked in git)
+├── tests/                  # Pest — Feature + Unit
+├── artisan
+├── composer.json
+├── package.json
+├── vite.config.js
+├── tailwind.config.js
+├── postcss.config.js
+└── tsconfig.json
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### `app/`
 
-### Premium Partners
+```
+app/
+├── Events/                 # Broadcasting events (e.g. messages, room membership)
+├── Helpers/                # Shared PHP helpers (e.g. encryption utilities)
+├── Http/
+│   ├── Controllers/
+│   │   ├── Auth/           # Breeze — login, register, password, verification
+│   │   ├── ConversationMemberController.php
+│   │   ├── CoversationController.php
+│   │   ├── MessageController.php
+│   │   ├── NicknameController.php
+│   │   ├── ProfileController.php
+│   │   └── Controller.php
+│   ├── Middleware/
+│   │   ├── CustomConfirmPassword.php
+│   │   └── HandleInertiaRequests.php
+│   └── Requests/
+│       ├── Auth/
+│       └── ProfileUpdateRequest.php
+├── Models/
+│   ├── Conversation.php
+│   ├── ConversationMember.php
+│   ├── Message.php
+│   └── User.php
+└── Providers/
+    └── AppServiceProvider.php
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### `resources/`
 
-## Contributing
+```
+resources/
+├── css/
+│   └── app.css             # Tailwind entry; imported from `resources/js/app.tsx`
+├── js/                     # Inertia + React (TypeScript) — see next section
+└── views/
+    └── app.blade.php       # HTML shell; `@vite` + Inertia root `<div id="app">`
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### `resources/js` — Inertia frontend
 
-## Code of Conduct
+This folder is the **Vite entry** (`vite.config.js` → `resources/js/app.tsx`). Laravel controllers return `Inertia::render('Some/Page', props)`; the first argument is a **path under `Pages/` without extension**, using `/` instead of nested folders (e.g. `Chat/Chat` → `Pages/Chat/Chat.tsx`).
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Bootstrapping**
 
-## Security Vulnerabilities
+| File | Role |
+|------|------|
+| `app.tsx` | `createInertiaApp`: resolves `./Pages/${name}.tsx` via `import.meta.glob`, wraps the app in `NetworkProvider`, sets document title from `VITE_APP_NAME`. |
+| `bootstrap.ts` | Default Axios setup (`X-Requested-With`), `window.Echo` + Pusher from `VITE_PUSHER_*` env vars. |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Folder roles**
+
+| Folder | Purpose |
+|--------|---------|
+| `Pages/` | **Inertia pages only** — one default export per file; names mirror `Inertia::render()` strings. Subfolders group by feature (Auth, Chat, Conversation, Profile). `Partials/` holds page-specific fragments (forms, modals) that are not top-level Inertia pages. |
+| `Layouts/` | Shells wrapped around pages (`AuthenticatedLayout`, `GuestLayout`) — navigation, headers, Breeze-style chrome. |
+| `Components/` | Shared presentational pieces (buttons, inputs, modals, `MessageCreator`, `TypingIndicator`, `NetworkStatus`, etc.) used across pages. |
+| `Context/` | React context providers (e.g. `network-context.tsx` for online/offline or connectivity). |
+| `Hooks/` | Reusable hooks (`useDebounce`) and small hook-style helpers (`Helper.tsx`). |
+| `types/` | Ambient and shared TS types: `global.d.ts` (e.g. `window` extensions), `vite-env.d.ts` (`ImportMeta.env`), `index.d.ts` for app-wide types. |
+
+**Full tree**
+
+```
+resources/js/
+├── app.tsx
+├── bootstrap.ts
+├── Components/
+│   ├── ApplicationLogo.tsx
+│   ├── Checkbox.tsx
+│   ├── DangerButton.tsx
+│   ├── Dropdown.tsx
+│   ├── InputError.tsx
+│   ├── InputLabel.tsx
+│   ├── MessageCreator.tsx
+│   ├── Modal.tsx
+│   ├── NavLink.tsx
+│   ├── NetworkStatus.tsx
+│   ├── OnlineStatus.tsx
+│   ├── PrimaryButton.tsx
+│   ├── ResponsiveNavLink.tsx
+│   ├── SecondaryButton.tsx
+│   ├── TextInput.tsx
+│   └── TypingIndicator.tsx
+├── Context/
+│   └── network-context.tsx
+├── Hooks/
+│   ├── Helper.tsx
+│   └── useDebounce.tsx
+├── Layouts/
+│   ├── AuthenticatedLayout.tsx
+│   └── GuestLayout.tsx
+├── Pages/
+│   ├── Auth/
+│   │   ├── ConfirmPassword.tsx
+│   │   ├── ForgotPassword.tsx
+│   │   ├── Login.tsx
+│   │   ├── Register.tsx
+│   │   ├── ResetPassword.tsx
+│   │   └── VerifyEmail.tsx
+│   ├── Chat/
+│   │   ├── Partials/
+│   │   │   └── AddUser.tsx
+│   │   ├── Chat.tsx
+│   │   └── ChatDetails.tsx
+│   ├── Conversation/
+│   │   ├── Partials/
+│   │   │   ├── CreateNickname.tsx
+│   │   │   └── NewRoom.tsx
+│   │   └── Index.tsx
+│   ├── Profile/
+│   │   ├── Partials/
+│   │   │   ├── DeleteUserForm.tsx
+│   │   │   ├── UpdatePasswordForm.tsx
+│   │   │   └── UpdateProfileInformationForm.tsx
+│   │   └── Edit.tsx
+│   ├── Dashboard.tsx
+│   └── Welcome.tsx
+└── types/
+    ├── global.d.ts
+    ├── index.d.ts
+    └── vite-env.d.ts
+```
+
+### Routes, tests, and Docker
+
+```
+routes/
+├── web.php                 # Conversations, chat, profile, redirects
+├── auth.php                # Breeze authentication routes
+├── channels.php            # Private / presence channel authorization
+└── console.php
+
+tests/
+├── Pest.php
+├── TestCase.php
+├── Feature/
+│   ├── Auth/               # Registration, login, password, email verification, …
+│   ├── ProfileTest.php
+│   └── ExampleTest.php
+└── Unit/
+    └── ExampleTest.php
+
+docker/
+├── mysql/
+└── php/                    # PHP-FPM / Alpine variants used for containerized setups
+```
+
+## Main HTTP flows
+
+- **`/`** → redirect to **`/conversation`** (conversation list / entry).
+- **`/conversation`** — list and create conversations; guest nickname via **`POST /nickname`**.
+- **`/chat/{chatID}`** — message UI; protected by auth and **`CustomConfirmPassword`** on GET; **`POST /chat/{chatID}`** sends messages (throttled).
+- **`/chat/details/{chatID}`** — room metadata.
+- **Members**: **`POST /coversation/add-user`**, **`POST /coversation/leave/{chatID}`** (password confirm).
+- **Profile** — Breeze-style **`/profile`** (edit / update / destroy).
+- **`/dashboard`** — Inertia `Dashboard` (auth + verified).
+
+> Note: some route paths use the historical spelling `coversation` in the URL; names use `conversation` where applicable.
+
+## Local development
+
+Prerequisites: PHP 8.2+, Composer, Node 18+, MySQL (or adjust `.env`), and a Pusher (or compatible) app for real-time features.
+
+1. **Environment**
+
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+   Fill database credentials, `APP_URL`, and Pusher / `VITE_*` values. See `.env.example` for the full list (including optional `AWS_*` for S3).
+
+2. **Backend**
+
+   ```bash
+   composer install
+   php artisan migrate
+   # optional
+   php artisan db:seed
+   ```
+
+3. **Frontend**
+
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+4. **App server** (separate terminal)
+
+   ```bash
+   php artisan serve
+   ```
+
+   Visit the URL shown by `serve` (and ensure Vite is running for hot reload).
+
+**Production build:** `npm run build` then deploy with a web server pointed at `public/`.
+
+**Checks:** `npm run check` runs TypeScript; `./vendor/bin/pest` runs tests.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project inherits the **MIT** license from its Laravel-based dependencies and application skeleton (see `composer.json`).
